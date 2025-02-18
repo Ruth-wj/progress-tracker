@@ -7,13 +7,21 @@ this uses a simple SQLite database, but you can easily replace it with whatever 
 
 ### How to run it on your own machine
 
-1. Install the requirements
+1. Create virtual environment
 
    ```
+   $ pyenv virtualenv 3.11 progress-tracker
+   ```
+
+2. Install the requirements
+
+   ```
+   $ pyenv activate progress-tracker
    $ pip install -r requirements.txt
+   $ pre-commit install
    ```
 
-2. Run the app
+3. Run the app
 
    ```
    $ streamlit run streamlit_app.py
