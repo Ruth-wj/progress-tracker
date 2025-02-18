@@ -4,7 +4,12 @@ import plotly.express as px
 import streamlit as st
 from pandas import read_csv
 
-from src.df_transforms import add_empty_dates, cast_df
+from src.df_transforms import (
+    add_empty_dates,
+    cast_df,
+    max_v_grade_cols,
+    session_type_col,
+)
 from src.google_drive import get_google_sheet
 
 # Set the title and favicon that appear in the Browser's tab bar.
@@ -16,20 +21,22 @@ st.set_page_config(
 spreadsheet_id = "10TIgTG7NW2RIHw3AaoMExAj5v1HVSWawaZG1mQsk9zg"
 out_dir = "tmp/"
 
-
 os.makedirs(out_dir, exist_ok=True)
 filepath = get_google_sheet(spreadsheet_id, out_dir, "raw_data.csv")
 
 raw_df = read_csv("./tmp/raw_data.csv")
 casted_df = cast_df(raw_df)
 df = add_empty_dates(casted_df)
+df = session_type_col(df)
+df = max_v_grade_cols(df)
 
 # Set the title that appears at the top of the page.
 """
 # :woman_climbing: Progress tracker
 
-**Welcome to Ruth's progress tracker!**
-This page reads from a view-only Google Sheet and displays the data.
+**Welcome to Ruth's climbing progress tracker!**
+
+This page reads from a view-only Google Sheet, transforms the data and plots the results.
 """
 
 st.subheader("Daily session view", divider="red")
@@ -48,7 +55,16 @@ st.plotly_chart(session_fig)
 
 st.subheader("Max V grade", divider="orange")
 
-max_v_fig = px.line(df, x="date", y="max_v_grade", height=400)
+max_v_fig = px.line(
+    df,
+    x="date",
+    y=["max_indoor_v_grade", "max_outdoor_v_grade"],
+    height=400,
+    range_y=[0, 10],
+    labels={"value": "V Grade", "variable": "Session Type"},
+)
 
 st.plotly_chart(max_v_fig)
 # -----------------------------------------------------------------------------
+
+st.subheader("", divider="violet")
